@@ -16,6 +16,7 @@ dependencies:
   shared_preferences: ^2.5.5
   js: ^0.7.2
   geolocator: ^11.0.0 # <--- NUEVA: Obligatoria para obtener las coordenadas GPS del dispositivo
+  webview_flutter: ^4.13.1
 
 dev_dependencies:
   flutter_test:

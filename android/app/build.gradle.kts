@@ -1,3 +1,13 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+// 1. Cargar el archivo key.properties que tiene las contraseñas de tu firma
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,7 +16,8 @@ plugins {
 }
 
 android {
-    namespace = "com.example.colombia_datos_y_iss"
+    // ID único interno para el sistema Android
+    namespace = "com.jesuasbit.colombia_datos_app" 
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -19,11 +30,20 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    // 2. Mapear las credenciales para la compilación de producción
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.colombia_datos_y_iss"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // ID único oficial para la tienda de Google Play Store
+        applicationId = "com.jesuasbit.colombia_datos_app"
+        
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -32,9 +52,8 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // 3. Cambiamos la firma de "debug" a tu firma oficial de "release"
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

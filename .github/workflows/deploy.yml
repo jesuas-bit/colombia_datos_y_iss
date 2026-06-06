@@ -1,0 +1,48 @@
+name: Deploy Flutter Web to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Se activa automáticamente cada vez que haces un push a la rama main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descarga el código fuente de tu repositorio
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configura Java en el servidor (necesario para las herramientas internas de Flutter)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. Instala Flutter en el servidor de GitHub
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # 4. Obtiene los paquetes y dependencias del proyecto (como webview_flutter)
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Compila el proyecto en HTML/WebGL optimizado para producción
+      # Usamos el nombre exacto de tu repositorio en GitHub para el direccionamiento de rutas
+      - name: Build Web
+        run: flutter build web --base-href "/colombia_datos_y_iss/"
+
+      # 6. Despliega borrando todo lo anterior en la rama de publicación (gh-pages)
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build/web # Carpeta generada por Flutter que contiene la web lista
+          branch: gh-pages  # Rama exclusiva donde se guardará tu página web visible
+          clean: true       # 🧹 ¡ESTO BORRA AUTOMÁTICAMENTE LOS ARCHIVOS VIEJOS ANTES DE PUBLICAR!
