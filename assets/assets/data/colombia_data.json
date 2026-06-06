@@ -1,0 +1,135 @@
+{
+  "regiones": [
+    {
+      "nombre": "Región Amazonía",
+      "superficie": "483.119 km²",
+      "poblacion": "1.100.000 hab.",
+      "clima": "Cálido Húmedo",
+      "economia": "Ecoturismo, Productos Forestales",
+      "desc": "El pulmón verde de Colombia, hogar de la mayor biodiversidad y comunidades indígenas ancestrales."
+    },
+    {
+      "nombre": "Región Andina",
+      "superficie": "282.540 km²",
+      "poblacion": "34.000.000 hab.",
+      "clima": "Variado (Pisos Térmicos)",
+      "economia": "Industria, Café, Flores, Minería",
+      "desc": "La región más poblada, ubicada sobre las tres cordilleras de los Andes."
+    },
+    {
+      "nombre": "Región Caribe",
+      "superficie": "132.288 km²",
+      "poblacion": "10.300.000 hab.",
+      "clima": "Cálido Tropical",
+      "economia": "Turismo, Puertos, Ganadería",
+      "desc": "Bañada por el Océano Atlántico, famosa por su cultura festiva y playas."
+    },
+    {
+      "nombre": "Región Insular",
+      "superficie": "300 km²",
+      "poblacion": "78.000 hab.",
+      "clima": "Cálido Marítimo",
+      "economia": "Turismo, Pesca",
+      "desc": "Comprende las islas de San Andrés, Providencia y Santa Catalina en el Caribe, y Gorgona y Malpelo en el Pacífico."
+    },
+    {
+      "nombre": "Región Orinoquía",
+      "superficie": "285.437 km²",
+      "poblacion": "1.700.000 hab.",
+      "clima": "Cálido Estacional",
+      "economia": "Ganadería, Petróleo",
+      "desc": "Conocida como los Llanos Orientales, tierra de vaquería y sabanas infinitas."
+    },
+    {
+      "nombre": "Región Pacífica",
+      "superficie": "83.170 km²",
+      "poblacion": "1.500.000 hab.",
+      "clima": "Cálido Superhúmedo",
+      "economia": "Pesca, Minería, Puertos",
+      "desc": "Una de las zonas más lluviosas del mundo, con selva densa y costa oceánica."
+    }
+  ],
+  "distritos_especiales": [
+    {"nombre": "Bogotá D.C.", "tipo": "Capital de la República", "codigo_dane": "11001", "base_legal": "Const. 1991", "funciones": "Centro administrativo, político y financiero del país."},
+    {"nombre": "Barranquilla", "tipo": "Industrial y Portuario", "codigo_dane": "08001", "base_legal": "Acto Leg. 01/1993", "funciones": "Nodo logístico fluvial y marítimo del Caribe."},
+    {"nombre": "Cartagena de Indias", "tipo": "Turístico y Cultural", "codigo_dane": "13001", "base_legal": "Acto Leg. 01/1987", "funciones": "Preservación del patrimonio histórico mundial."},
+    {"nombre": "Santa Marta", "tipo": "Turístico, Cultural e Histórico", "codigo_dane": "47001", "base_legal": "Acto Leg. 03/1989", "funciones": "Desarrollo turístico de la Sierra Nevada y el Caribe."},
+    {"nombre": "Buenaventura", "tipo": "Industrial y Portuario", "codigo_dane": "76109", "base_legal": "Acto Leg. 02/2007", "funciones": "Principal puerto comercial de Colombia en el Pacífico."},
+    {"nombre": "Riohacha", "tipo": "Especial, Turístico y Cultural", "codigo_dane": "44001", "base_legal": "Ley 1766 de 2015", "funciones": "Integración fronteriza y cultura Wayúu."},
+    {"nombre": "Santiago de Cali", "tipo": "Deportivo, Cultural y Empresarial", "codigo_dane": "76001", "base_legal": "Acto Leg. 01/2018", "funciones": "Clúster de servicios médicos y deportivos de alto nivel."},
+    {"nombre": "Medellín", "tipo": "Ciencia, Tecnología e Innovación", "codigo_dane": "05001", "base_legal": "Acto Leg. 01/2021", "funciones": "Transformación tecnológica y economía digital."},
+    {"nombre": "Cúcuta", "tipo": "Especial, Fronterizo y Económico", "codigo_dane": "54001", "base_legal": "Acto Leg. 01/2020", "funciones": "Comercio internacional e integración binacional."},
+    {"nombre": "Tumaco", "tipo": "Especial, Portuario y Biodiverso", "codigo_dane": "52835", "base_legal": "Acto Leg. 02/2018", "funciones": "Desarrollo pesquero y protección de manglares."},
+    {"nombre": "Tunja", "tipo": "Histórico y Cultural", "codigo_dane": "15001", "base_legal": "Ley 1966 de 2019", "funciones": "Protección de arquitectura colonial y académica."},
+    {"nombre": "Turbo", "tipo": "Especial, Portuario y Logístico", "codigo_dane": "05837", "base_legal": "Acto Leg. 01/2016", "funciones": "Desarrollo del Golfo de Urabá."}
+  ],
+  "departamentos": [
+    {"nombre": "Amazonas", "capital": "Leticia", "codigo_dane": "91", "gentilicio": "Amazonense", "municipios": ["Leticia", "Puerto Nariño", "El Encanto", "La Chorrera", "Tarapacá", "Puerto Alegría"]},
+    {"nombre": "Antioquia", "capital": "Medellín", "codigo_dane": "05", "gentilicio": "Antioqueño", "municipios": ["Medellín", "Bello", "Itagüí", "Envigado", "Apartadó", "Rionegro", "Turbo", "Caucasia", "Guatapé", "Barbarosa", "Sabaneta", "La Estrella"]},
+    {"nombre": "Arauca", "capital": "Arauca", "codigo_dane": "81", "gentilicio": "Araucano", "municipios": ["Arauca", "Arauquita", "Saravena", "Tame", "Fortul", "Puerto Rondón"]},
+    {"nombre": "Atlántico", "capital": "Barranquilla", "codigo_dane": "08", "gentilicio": "Atlanticense", "municipios": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga", "Baranoa", "Puerto Colombia", "Galapa"]},
+    {"nombre": "Bolívar", "capital": "Cartagena", "codigo_dane": "13", "gentilicio": "Bolivarense", "municipios": ["Cartagena", "Magangué", "Turbaco", "Arjona", "El Carmen de Bolívar", "Mompox", "Santa Rosa"]},
+    {"nombre": "Boyacá", "capital": "Tunja", "codigo_dane": "15", "gentilicio": "Boyacense", "municipios": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá", "Puerto Boyacá", "Paipa", "Villa de Leyva"]},
+    {"nombre": "Caldas", "capital": "Manizales", "codigo_dane": "17", "gentilicio": "Caldense", "municipios": ["Manizales", "La Dorada", "Riosucio", "Chinchiná", "Villamaría", "Anserma", "Aguadas"]},
+    {"nombre": "Caquetá", "capital": "Florencia", "codigo_dane": "18", "gentilicio": "Caqueteño", "municipios": ["Florencia", "San Vicente del Caguán", "Puerto Rico", "Curillo", "Cartagena del Chairá"]},
+    {"nombre": "Casanare", "capital": "Yopal", "codigo_dane": "85", "gentilicio": "Casanareño", "municipios": ["Yopal", "Aguazul", "Villanueva", "Tauramena", "Paz de Ariporo", "Mani", "Orocué"]},
+    {"nombre": "Cauca", "capital": "Popayán", "codigo_dane": "19", "gentilicio": "Caucano", "municipios": ["Popayán", "Santander de Quilichao", "Puerto Tejada", "Patía", "Miranda", "Silvia", "Guapi"]},
+    {"nombre": "Cesar", "capital": "Valledupar", "codigo_dane": "20", "gentilicio": "Cesarense", "municipios": ["Valledupar", "Aguachica", "Agustín Codazzi", "Bosconia", "Curumaní", "El Paso"]},
+    {"nombre": "Chocó", "capital": "Quibdó", "codigo_dane": "27", "gentilicio": "Chocoano", "municipios": ["Quibdó", "Istmina", "Condoto", "Bahía Solano", "Acandí", "Nuquí", "Riosucio"]},
+    {"nombre": "Córdoba", "capital": "Montería", "codigo_dane": "23", "gentilicio": "Cordobés", "municipios": ["Montería", "Cereté", "Sahagún", "Lorica", "Montelíbano", "Planeta Rica", "Tierralta"]},
+    {"nombre": "Cundinamarca", "capital": "Bogotá", "codigo_dane": "25", "gentilicio": "Cundinamarqués", "municipios": ["Soacha", "Fusagasugá", "Facatativá", "Chía", "Zipaquirá", "Girardot", "Mosquera", "Madrid", "Funza"]},
+    {"nombre": "Guainía", "capital": "Inírida", "codigo_dane": "94", "gentilicio": "Guainiano", "municipios": ["Inírida", "Barrancominas", "Mapiripana", "San Felipe", "Puerto Colombia"]},
+    {"nombre": "Guaviare", "capital": "San José del Guaviare", "codigo_dane": "95", "gentilicio": "Guaviarense", "municipios": ["San José del Guaviare", "Calamar", "El Retorno", "Miraflores"]},
+    {"nombre": "Huila", "capital": "Neiva", "codigo_dane": "41", "gentilicio": "Huilense", "municipios": ["Neiva", "Pitalito", "Garzón", "La Plata", "Campoalegre", "San Agustín", "Gigante"]},
+    {"nombre": "La Guajira", "capital": "Riohacha", "codigo_dane": "44", "gentilicio": "Guajiro", "municipios": ["Riohacha", "Maicao", "Uribia", "Manaure", "San Juan del Cesar", "Fonseca", "Barrancas"]},
+    {"nombre": "Magdalena", "capital": "Santa Marta", "codigo_dane": "47", "gentilicio": "Magdalenense", "municipios": ["Santa Marta", "Ciénaga", "Fundación", "El Banco", "Plato", "Aracataca", "Pivijay"]},
+    {"nombre": "Meta", "capital": "Villavicencio", "codigo_dane": "50", "gentilicio": "Metense", "municipios": ["Villavicencio", "Acacías", "Granada", "Puerto López", "Puerto Gaitán", "Cumaral"]},
+    {"nombre": "Nariño", "capital": "Pasto", "codigo_dane": "52", "gentilicio": "Nariñense", "municipios": ["Pasto", "Ipiales", "Tumaco", "Túquerres", "La Unión", "Sandoná", "Cumbal", "Barbacoas"]},
+    {"nombre": "Norte de Santander", "capital": "Cúcuta", "codigo_dane": "54", "gentilicio": "Nortesantandereano", "municipios": ["Cúcuta", "Ocaña", "Pamplona", "Villa del Rosario", "Los Patios", "Tibú", "Chitagá"]},
+    {"nombre": "Putumayo", "capital": "Mocoa", "codigo_dane": "86", "gentilicio": "Putumayense", "municipios": ["Mocoa", "Puerto Asís", "Orito", "Valle del Guamuez", "Sibundoy", "Villagarzón"]},
+    {"nombre": "Quindío", "capital": "Armenia", "codigo_dane": "63", "gentilicio": "Quindiano", "municipios": ["Armenia", "Calarcá", "La Tebaida", "Circasia", "Montenegro", "Quimbaya", "Salento"]},
+    {"nombre": "Risaralda", "capital": "Pereira", "codigo_dane": "66", "gentilicio": "Risaraldense", "municipios": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal", "La Virginia", "Belén de Umbría"]},
+    {"nombre": "San Andrés", "capital": "San Andrés", "codigo_dane": "88", "gentilicio": "Sanandresano", "municipios": ["San Andrés", "Providencia y Santa Catalina"]},
+    {"nombre": "Santander", "capital": "Bucaramanga", "codigo_dane": "68", "gentilicio": "Santandereano", "municipios": ["Bucaramanga", "Floridablanca", "Girón", "Piedecuesta", "Barrancabermeja", "San Gil", "Socorro", "Barichara"]},
+    {"nombre": "Sucre", "capital": "Sincelejo", "codigo_dane": "70", "gentilicio": "Sucreño", "municipios": ["Sincelejo", "Corozal", "San Marcos", "Tolú", "Sampués", "San Onofre"]},
+    {"nombre": "Tolima", "capital": "Ibagué", "codigo_dane": "73", "gentilicio": "Tolimense", "municipios": ["Ibagué", "Espinal", "Melgar", "Mariquita", "Honda", "Líbano", "Chaparral", "Guamo"]},
+    {"nombre": "Valle del Cauca", "capital": "Cali", "codigo_dane": "76", "gentilicio": "Vallecaucano", "municipios": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Buga", "Cartago", "Jamundí", "Yumbo"]},
+    {"nombre": "Vaupés", "capital": "Mitú", "codigo_dane": "97", "gentilicio": "Vaupense", "municipios": ["Mitú", "Carurú", "Taraira", "Pacoa", "Yavaraté"]},
+    {"nombre": "Vichada", "capital": "Puerto Carreño", "codigo_dane": "99", "gentilicio": "Vichadense", "municipios": ["Puerto Carreño", "La Primavera", "Santa Rosalía", "Cumaribo"]}
+  ],
+  "atracciones": [
+    {
+      "nombre": "Santuario de Las Lajas",
+      "lugar": "Ipiales, Nariño",
+      "categoria": "Turismo Cultural",
+      "tipologia": "Arquitectura Religiosa",
+      "desc": "Basílica neogótica construida sobre el cañón del río Guáitara. Una joya arquitectónica mundial.",
+      "imagen": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Santuario_de_Las_Lajas%2C_Ipiales%2C_Colombia%2C_2015-03-05%2C_DD_17.JPG/1024px-Santuario_de_Las_Lajas%2C_Ipiales%2C_Colombia%2C_2015-03-05%2C_DD_17.JPG",
+      "como_llegar": "Terrestre desde Pasto (2 horas).",
+      "infraestructura": "Hoteles en Ipiales, guías locales.",
+      "alertas": "Clima frío, altura de 2.900m."
+    },
+    {
+      "nombre": "Cabo San Juan - Tayrona",
+      "lugar": "Santa Marta, Magdalena",
+      "categoria": "Sol y Playa",
+      "tipologia": "Naturaleza Virgen",
+      "desc": "La playa más icónica del Parque Tayrona, donde la selva de la Sierra Nevada abraza el mar.",
+      "imagen": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Cabo_San_Juan_de_Guia_-_Parque_Tayrona.jpg/1024px-Cabo_San_Juan_de_Guia_-_Parque_Tayrona.jpg",
+      "como_llegar": "Trekking desde la entrada del Zaíno.",
+      "infraestructura": "Camping y hamacas autorizadas.",
+      "alertas": "Llevar repelente y agua. Vacuna fiebre amarilla."
+    },
+    {
+      "nombre": "Caño Cristales",
+      "lugar": "La Macarena, Meta",
+      "categoria": "Turismo de Naturaleza",
+      "tipologia": "Ecoturismo",
+      "desc": "El río más hermoso del mundo o el río de los 7 colores gracias a las algas Macarenia clavigera.",
+      "imagen": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Cano_Cristales_River_of_5_Colors.jpg/1024px-Cano_Cristales_River_of_5_Colors.jpg",
+      "como_llegar": "Vuelo a La Macarena, luego lancha y caminata.",
+      "infraestructura": "Hospedaje en el pueblo de La Macarena.",
+      "alertas": "Prohibido bloqueador solar en el río."
+    }
+  ]
+}
