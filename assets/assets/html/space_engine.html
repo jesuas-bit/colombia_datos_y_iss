@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Space Engine 3D Pro</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background-color: #010206; color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+    #canvas-3d-container {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+    }
+    .dashboard-panel {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      width: 88vw; max-width: 440px; padding: 14px;
+      background: rgba(10, 15, 30, 0.75); border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      box-sizing: border-box; z-index: 10; pointer-events: auto;
+    }
+    .dashboard-panel h2 {
+      margin: 0 0 4px 0; font-size: 11px; font-weight: 800;
+      letter-spacing: 0.15em; text-transform: uppercase; color: #93c5fd;
+    }
+    .dashboard-panel p {
+      margin: 0 0 10px 0; font-size: 12px; color: #94a3b8;
+    }
+    .telemetry-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .card-metric {
+      padding: 8px; background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; text-align: center;
+    }
+    .card-metric span {
+      display: block; font-size: 8px; font-weight: 700; color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;
+    }
+    .card-metric strong {
+      display: block; font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #f8fafc;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <div id="canvas-3d-container"></div>
+
+  <div class="dashboard-panel">
+    <h2>Space Engine 3D Pro</h2>
+    <p id="status-text">Estableciendo enlace de telemetría...</p>
+    
+    <div class="telemetry-grid">
+      <div class="card-metric">
+        <span>Latitud</span><strong id="m-lat">0.0000</strong>
+      </div>
+      <div class="card-metric">
+        <span>Longitud</span><strong id="m-lng">0.0000</strong>
+      </div>
+      <div class="card-metric">
+        <span>Orientación</span><strong id="m-snap" style="color: #facc15;">--</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mLat = document.getElementById('m-lat');
+    const mLng = document.getElementById('m-lng');
+    const mSnap = document.getElementById('m-snap');
+    const statusText = document.getElementById('status-text');
+
+    var container = document.getElementById('canvas-3d-container');
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    var worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.8); 
+    scene.add(ambientLight);
+    
+    var sunLight = new THREE.DirectionalLight(0xffffff, 1.8); 
+    sunLight.position.set(5, 3, 5);
+    scene.add(sunLight);
+
+    var textureLoader = new THREE.TextureLoader();
+    textureLoader.crossOrigin = 'anonymous';
+
+    var earthMap = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+    var bumpMap = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-topology.png');
+    var cloudMap = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-clouds.png');
+
+    var earthGeo = new THREE.SphereGeometry(2, 64, 64);
+    var earthMat = new THREE.MeshPhongMaterial({ map: earthMap, bumpMap: bumpMap, bumpScale: 0.03, shininess: 15 });
+    var earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    worldGroup.add(earthMesh);
+
+    var cloudGeo = new THREE.SphereGeometry(2.018, 64, 64);
+    var cloudMat = new THREE.MeshPhongMaterial({ map: cloudMap, transparent: true, opacity: 0.5 });
+    var cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+    worldGroup.add(cloudMesh);
+
+    var atmosGeo = new THREE.SphereGeometry(2.05, 64, 64);
+    var atmosMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, transparent: true, opacity: 0.15, side: THREE.BackSide });
+    var atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+    worldGroup.add(atmosMesh);
+
+    var issRoot = new THREE.Group();
+    
+    var coreGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.22, 12);
+    var coreMat = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x333333, shininess: 80 });
+    var core = new THREE.Mesh(coreGeo, coreMat);
+    core.rotation.z = Math.PI / 2;
+    issRoot.add(core);
+
+    var panelGeo = new THREE.BoxGeometry(0.06, 0.45, 0.005);
+    var panelMat = new THREE.MeshPhongMaterial({ color: 0xffb703, shininess: 100, side: THREE.DoubleSide });
+    
+    var leftPanels = new THREE.Mesh(panelGeo, panelMat);
+    leftPanels.position.x = -0.16;
+    var rightPanels = leftPanels.clone();
+    rightPanels.position.x = 0.16;
+    
+    issRoot.add(leftPanels);
+    issRoot.add(rightPanels);
+    worldGroup.add(issRoot);
+
+    camera.position.set(0, 0, 6.5);
+
+    var isDragging = false;
+    var prevMouse = { x: 0, y: 0 };
+    var snapCamera = true;
+
+    var targetIssData = { lat: 0, lng: 0 };
+    var issData = { lat: 0, lng: 0, initialized: false };
+
+    function startDrag(x, y) { 
+      isDragging = true; 
+      snapCamera = false; 
+      prevMouse = { x: x, y: y }; 
+      mSnap.textContent = 'Libre';
+
+      if (window.FlutterSpaceChannel) {
+        window.FlutterSpaceChannel.postMessage('modo_libre_activado');
+      }
+    }
+
+    function moveDrag(x, y) {
+      if(!isDragging) return;
+      var dx = x - prevMouse.x;
+      var dy = y - prevMouse.y;
+      worldGroup.rotation.y += dx * 0.005;
+      worldGroup.rotation.x += dy * 0.005;
+      prevMouse = { x: x, y: y };
+      statusText.textContent = 'Modo rotación libre activo.';
+    }
+
+    container.addEventListener('mousedown', function(e) { startDrag(e.offsetX, e.offsetY); });
+    container.addEventListener('mousemove', function(e) { moveDrag(e.offsetX, e.offsetY); });
+    window.addEventListener('mouseup', function() { isDragging = false; });
+    
+    container.addEventListener('touchstart', function(e) { var t = e.touches[0]; startDrag(t.clientX, t.clientY); });
+    container.addEventListener('touchmove', function(e) { var t = e.touches[0]; moveDrag(t.clientX, t.clientY); });
+    window.addEventListener('touchend', function() { isDragging = false; });
+
+    window.issResetCamera = function() { 
+      snapCamera = true; 
+      mSnap.textContent = 'Anclado';
+      statusText.textContent = 'Cámara reajustada al vector ISS.';
+    };
+
+    window.updateSpaceEngine = function(lat, lng, forceSnap) {
+      if(forceSnap !== undefined) {
+        snapCamera = forceSnap;
+        mSnap.textContent = forceSnap ? 'Anclado' : 'Libre';
+      }
+      
+      mLat.textContent = lat.toFixed(4);
+      mLng.textContent = lng.toFixed(4);
+      if (statusText.textContent.includes('telemetría')) {
+        statusText.textContent = 'ISS en órbita activa';
+      }
+
+      targetIssData.lat = lat;
+      targetIssData.lng = lng;
+      
+      if (!issData.initialized) {
+        issData.lat = lat;
+        issData.lng = lng;
+        issData.initialized = true;
+      }
+    };
+
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.addEventListener('message', function(event) {
+      if (!event.data) return;
+      if (event.data.action === 'updateSpaceEngine') {
+        window.updateSpaceEngine(event.data.lat, event.data.lng, event.data.snap);
+      } else if (event.data.action === 'issResetCamera') {
+        window.issResetCamera();
+      } else if (event.data.type === 'DATA_ISS') {
+        window.updateSpaceEngine(event.data.lat, event.data.lng, event.data.snap);
+      }
+    });
+
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+      cloudMesh.rotation.y += 0.0002;
+
+      if (issData.initialized) {
+        var dLng = targetIssData.lng - issData.lng;
+        if (dLng > 180) issData.lng += 360;
+        if (dLng < -180) issData.lng -= 360;
+
+        issData.lat = THREE.MathUtils.lerp(issData.lat, targetIssData.lat, 0.02);
+        issData.lng = THREE.MathUtils.lerp(issData.lng, targetIssData.lng, 0.02);
+
+        var phi = (90 - issData.lat) * (Math.PI / 180);
+        var theta = (issData.lng + 180) * (Math.PI / 180);
+        var radius = 2.35;
+        
+        issRoot.position.x = -radius * Math.sin(phi) * Math.sin(theta);
+        issRoot.position.y = radius * Math.cos(phi);
+        issRoot.position.z = radius * Math.sin(phi) * Math.cos(theta);
+        issRoot.lookAt(0, 0, 0);
+
+        if (snapCamera) {
+          worldGroup.rotation.x = THREE.MathUtils.lerp(worldGroup.rotation.x, 0, 0.05);
+          worldGroup.rotation.y = THREE.MathUtils.lerp(worldGroup.rotation.y, 0, 0.05);
+          worldGroup.rotation.z = THREE.MathUtils.lerp(worldGroup.rotation.z, 0, 0.05);
+
+          // --- MATEMÁTICA CORREGIDA PARA TIERRA DE FONDO E ISS CENTRADA ---
+          var issPos = issRoot.position.clone(); 
+          var upDir = issPos.clone().normalize(); // Vector hacia el espacio
+          
+          var worldNorth = new THREE.Vector3(0, 1, 0);
+          
+          // Calculamos el Este y luego un vector Tangente local 
+          // para ubicar la cámara paralela a la superficie y ver el horizonte curvo
+          var east = new THREE.Vector3().crossVectors(worldNorth, upDir).normalize();
+          if (east.lengthSq() < 0.001) east.set(1, 0, 0); 
+          var tangentDir = new THREE.Vector3().crossVectors(upDir, east).normalize();
+          
+          // Posicionamos la cámara:
+          // 1. Un poco más "arriba" de la ISS (alejada de la Tierra)
+          var heightOffset = upDir.clone().multiplyScalar(0.55); 
+          // 2. Alejarla sobre la tangente para que la Tierra quede de fondo (debajo)
+          var depthOffset = tangentDir.clone().multiplyScalar(1.3); 
+          
+          var targetCamPos = issPos.clone().add(heightOffset).add(depthOffset);
+          
+          camera.position.lerp(targetCamPos, 0.05);
+          // ALINEACIÓN CLAVE: Obligamos a que el "arriba" de la cámara sea hacia el espacio
+          // Esto fuerza a que la Tierra siempre quede en la parte inferior de la pantalla.
+          camera.up.lerp(upDir, 0.05); 
+          camera.lookAt(issPos);
+
+        } else {
+          var targetFreePos = new THREE.Vector3(0, 0, 6.5);
+          camera.position.lerp(targetFreePos, 0.05);
+          camera.up.lerp(new THREE.Vector3(0, 1, 0), 0.05);
+          camera.lookAt(0, 0, 0);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+    
+    renderLoop();
+  </script>
+</body>
+</html>
