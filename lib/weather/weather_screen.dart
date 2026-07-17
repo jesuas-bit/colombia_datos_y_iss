@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart'; // 📦 IMPORTANTE: Nueva importación
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
@@ -39,8 +40,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = false;
 
-  // Historial de la sesión (Se va poblando dinámicamente)
-  final List<Map<String, dynamic>> _historialRegistros = [];
+  // Historial de la sesión (¡Ahora persistirá en el dispositivo!)
+  List<Map<String, dynamic>> _historialRegistros = [];
 
   final List<Map<String, String>> _tablaFrec = [
     {"rango": "Calma (0-10)", "abs": "0", "porcentaje": "0.0"},
@@ -52,9 +53,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   void initState() {
     super.initState();
-    // 1. Intentar geolocalizar de inmediato al entrar a la pantalla
+    // 1. Cargar el historial guardado en SharedPreferences antes de iniciar las consultas
+    _cargarHistorialPersistente();
+    // 2. Intentar geolocalizar de inmediato al entrar a la pantalla
     _obtenerUbicacionActualGPS();
-    // 2. Iniciar el loop repetitivo de actualizaciones cada 5 segundos
+    // 3. Iniciar el loop repetitivo de actualizaciones cada 5 segundos
     _iniciarCicloClima();
   }
 
@@ -64,6 +67,51 @@ class _WeatherScreenState extends State<WeatherScreen> {
     _timerActualizacion?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  // =========================================================================
+  // LÓGICA DE PERSISTENCIA (MÉTODOS NUEVOS)
+  // =========================================================================
+
+  // Carga el historial desde el almacenamiento local al iniciar la app
+  Future<void> _cargarHistorialPersistente() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? historialString = prefs.getString('historial_clima');
+
+      if (historialString != null) {
+        final List<dynamic> decodedList = json.decode(historialString);
+        setState(() {
+          _historialRegistros = decodedList
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList();
+          _actualizarTablaFrecuencias();
+        });
+      }
+    } catch (e) {
+      debugPrint("Error cargando el historial persistente: $e");
+    }
+  }
+
+  // Guarda la lista del historial codificada en formato JSON string
+  Future<void> _guardarHistorialPersistente() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String encodedData = json.encode(_historialRegistros);
+      await prefs.setString('historial_clima', encodedData);
+    } catch (e) {
+      debugPrint("Error guardando el historial persistente: $e");
+    }
+  }
+
+  // Opcional: Si deseas agregar un botón en el futuro para vaciar el historial
+  Future<void> _limpiarHistorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('historial_clima');
+    setState(() {
+      _historialRegistros.clear();
+      _actualizarTablaFrecuencias();
+    });
   }
 
   // =========================================================================
@@ -88,7 +136,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
+          locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.low,
+      ));
 
       _latitudActiva = position.latitude;
       _longitudActiva = position.longitude;
@@ -154,6 +204,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
           _actualizarTablaFrecuencias();
         });
+
+        // 🔥 ¡CORRECCIÓN AQUÍ!: Guardamos en disco justo después de mutar el estado
+        _guardarHistorialPersistente();
       }
     } catch (e) {
       debugPrint("Error de conexión climática: $e");
@@ -212,7 +265,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
       }
     }
     int total = _historialRegistros.length;
-    if (total == 0) return;
+
+    // Si la lista está vacía tras reiniciar, ponemos la tabla de frecuencias en ceros de forma limpia
+    if (total == 0) {
+      setState(() {
+        for (var i = 0; i < _tablaFrec.length; i++) {
+          _tablaFrec[i]["abs"] = "0";
+          _tablaFrec[i]["porcentaje"] = "0.0";
+        }
+      });
+      return;
+    }
 
     setState(() {
       _tablaFrec[0] = {
@@ -263,6 +326,16 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     fontWeight: FontWeight.bold),
               ),
         actions: [
+          // Botón de papelera para limpiar el historial persistente si lo deseas
+          IconButton(
+            icon: const Icon(Icons.delete_sweep, color: Colors.redAccent),
+            tooltip: 'Borrar todo el historial guardado',
+            onPressed: () {
+              if (_historialRegistros.isNotEmpty) {
+                _limpiarHistorial();
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.my_location, color: Colors.tealAccent),
             onPressed: _obtenerUbicacionActualGPS,
@@ -364,7 +437,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                       letterSpacing: 0.5),
                 ),
                 Text(
-                  "Sincronizado",
+                  "Guardado Permanente",
                   style: TextStyle(
                       color: Colors.greenAccent.withAlpha(150), fontSize: 10),
                 )
@@ -378,6 +451,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
+  // [Tus widgets secundarios se mantienen exactamente igual...]
   Widget _buildMainWeatherHeader() {
     return Container(
       width: double.infinity,
@@ -549,8 +623,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
           ? const Padding(
               padding: EdgeInsets.all(20.0),
               child: Center(
-                  child: Text("Esperando primer ciclo de datos...",
-                      style: TextStyle(color: Colors.white54))),
+                child: Text("Esperando primer ciclo de datos...",
+                    style: TextStyle(color: Colors.white54)),
+              ),
             )
           : SingleChildScrollView(
               scrollDirection: Axis.vertical,

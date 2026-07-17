@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// 1. LAS IMPORTACIONES DEBEN APUNTAR EXACTAMENTE A TUS CARPETAS
+// 1. IMPORTACIONES ORIGINALES DE TUS CARPETAS
 import 'package:colombia_datos_y_iss/colombia/colombia_screen.dart';
 import 'package:colombia_datos_y_iss/iss/iss_screen.dart';
 import 'package:colombia_datos_y_iss/weather/weather_screen.dart';
@@ -40,99 +40,112 @@ class _MainScaffoldState extends State<MainScaffold> {
   // Controla cuál de los 3 módulos se renderiza
   int _moduloSeleccionado = 0;
 
-  // 2. LA LISTA DE MÓDULOS DONDE OCURRÍA EL ERROR DE NOMENCLATURA
-  // (Asegúrate de que en 'colombia_screen.dart' la clase se llame 'ColombiaScreen')
+  // Lista de tus pantallas principales
   final List<Widget> _modulos = [
-    const ColombiaScreen(), // Línea 44: Índice 0 - Dashboard de Colombia
-    const WeatherScreen(), // Índice 1 - Módulo de Clima
-    const IssScreen(), // Índice 2 - Rastreador ISS
+    const ColombiaScreen(),
+    const WeatherScreen(),
+    const IssScreen(),
+  ];
+
+  // Títulos dinámicos para saber en qué pantalla estamos parados
+  final List<String> _titulos = [
+    "INICIO / COLOMBIA",
+    "MÓDULO DE CLIMA",
+    "RASTREADOR ISS",
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        children: [
-          // MENÚ LATERAL PERSISTENTE
-          Container(
-            width: 260,
-            color: const Color(0xFF151125),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 40.0, left: 24.0, bottom: 30.0),
-                  child: Row(
-                    children: [
-                      Icon(Icons.layers_outlined,
-                          color: Colors.amber[400], size: 28),
-                      const SizedBox(width: 12),
-                      const Text(
-                        "Portal de Módulos",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Divider(color: Colors.white10, height: 1),
-                const SizedBox(height: 16),
-
-                // ÍTEM 0: Dashboard Colombia
-                _buildMenuButton(
-                  index: 0,
-                  icon: Icons.map_outlined,
-                  label: "Inicio / Colombia",
-                  activeColor: Colors.blueAccent,
-                ),
-
-                // ÍTEM 1: Módulo de Clima
-                _buildMenuButton(
-                  index: 1,
-                  icon: Icons.cloud_queue,
-                  label: "Módulo de Clima",
-                  activeColor: Colors.amber,
-                ),
-
-                // ÍTEM 2: Rastreador ISS
-                _buildMenuButton(
-                  index: 2,
-                  icon: Icons.rocket_launch_outlined,
-                  label: "Rastreador ISS",
-                  activeColor: Colors.tealAccent,
-                ),
-
-                const Spacer(),
-
-                const Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Text(
-                    "Sistema de Monitoreo v1.0",
-                    style: TextStyle(color: Colors.white24, fontSize: 11),
-                  ),
-                ),
-              ],
-            ),
+      // CORRECCIÓN NATIVA 1: Creamos el AppBar superior que contiene el botón "hamburguesa"
+      appBar: AppBar(
+        title: Text(
+          _titulos[_moduloSeleccionado],
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
           ),
+        ),
+        backgroundColor: const Color(0xFF090D16),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
 
-          const VerticalDivider(color: Colors.white10, width: 1),
-
-          // ÁREA DE CONTENIDO DINÁMICO CONMUTABLE
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: KeyedSubtree(
-                key: ValueKey<int>(_moduloSeleccionado),
-                child: _modulos[_moduloSeleccionado],
+      // CORRECCIÓN NATIVA 2: El menú pasa de ser un Row invasivo a un Drawer flotante
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF151125),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Cabecera superior interna del menú
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 60.0, left: 24.0, bottom: 30.0),
+              child: Row(
+                children: [
+                  Icon(Icons.layers_outlined,
+                      color: Colors.amber[400], size: 28),
+                  const SizedBox(width: 12),
+                  const Text(
+                    "Portal de Módulos",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+
+            const Divider(color: Colors.white10, height: 1),
+            const SizedBox(height: 16),
+
+            // ÍTEM 0: Dashboard Colombia
+            _buildMenuButton(
+              index: 0,
+              icon: Icons.map_outlined,
+              label: "Inicio / Colombia",
+              activeColor: Colors.blueAccent,
+            ),
+
+            // ÍTEM 1: Módulo de Clima
+            _buildMenuButton(
+              index: 1,
+              icon: Icons.cloud_queue,
+              label: "Módulo de Clima",
+              activeColor: Colors.amber,
+            ),
+
+            // ÍTEM 2: Rastreador ISS
+            _buildMenuButton(
+              index: 2,
+              icon: Icons.rocket_launch_outlined,
+              label: "Rastreador ISS",
+              activeColor: Colors.tealAccent,
+            ),
+
+            const Spacer(),
+
+            const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Text(
+                "Sistema de Monitoreo v1.0",
+                style: TextStyle(color: Colors.white24, fontSize: 11),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // CORRECCIÓN NATIVA 3: El cuerpo de las regiones ahora ocupa el 100% de la pantalla limpiamente
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: KeyedSubtree(
+          key: ValueKey<int>(_moduloSeleccionado),
+          child: _modulos[_moduloSeleccionado],
+        ),
       ),
     );
   }
@@ -153,6 +166,9 @@ class _MainScaffoldState extends State<MainScaffold> {
           setState(() {
             _moduloSeleccionado = index;
           });
+          // 💡 IMPORTANTE: Esto cierra automáticamente el menú lateral deslizándolo
+          // hacia la izquierda inmediatamente después de presionar la opción.
+          Navigator.pop(context);
         },
         borderRadius: BorderRadius.circular(8),
         child: Container(

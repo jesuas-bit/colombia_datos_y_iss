@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Space Engine Pro - 100% Autónomo</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #02040a;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .scene-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: 
+        radial-gradient(circle at 50% 40%, #111a3a 0%, #02040a 75%),
+        radial-gradient(1px 1px at 25px 35px, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 140px 60px, #ddd, transparent);
+      background-size: 100% 100%, 200px 200px, 250px 250px;
+    }
+
+    .viewport-orbital {
+      position: relative;
+      width: 85vw;
+      height: 85vw;
+      max-width: 340px;
+      max-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      margin-top: -12vh;
+    }
+
+    /* Planeta Tierra con sombreado esférico CSS puro (Libre de CORS) */
+    .planet-sphere {
+      position: absolute;
+      width: 42%;
+      height: 42%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #4fa8ff 0%, #1d4ed8 45%, #0b1329 90%);
+      box-shadow: 
+        0 0 35px rgba(59, 130, 246, 0.55),
+        inset -12px -12px 25px rgba(0,0,0,0.85);
+      z-index: 2;
+    }
+
+    /* Anillo Orbital estilizado con inclinación 3D */
+    .orbit-ellipse {
+      position: absolute;
+      width: 95%;
+      height: 95%;
+      border: 1.5px dashed rgba(147, 197, 253, 0.35);
+      border-radius: 50%;
+      transform: rotateX(68deg) rotateY(-12deg);
+      z-index: 1;
+      box-sizing: border-box;
+    }
+
+    /* Satélite ISS con diseño H de paneles extendidos */
+    .iss-element {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      z-index: 3;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Geometría de los paneles solares de la ISS pintados por código */
+    .iss-element::before {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 22px;
+      background: #eab308;
+      box-shadow: -10px 0 0 #eab308, 10px 0 0 #eab308, 0 0 8px #facc15;
+      border-radius: 1px;
+    }
+
+    .iss-element::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 6px #ffffff;
+    }
+
+    /* Panel Flotante HUD Dashboard */
+    .dashboard-panel {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88vw;
+      max-width: 440px;
+      padding: 14px;
+      background: rgba(9, 13, 22, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-sizing: border-box;
+      z-index: 10;
+    }
+
+    .dashboard-panel h2 {
+      margin: 0 0 4px 0;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #38bdf8;
+    }
+
+    .dashboard-panel p {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .card-metric {
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .card-metric span {
+      display: block;
+      font-size: 8px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .card-metric strong {
+      display: block;
+      font-size: 13px;
+      font-family: monospace;
+      color: #f8fafc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene-container">
+    <div class="viewport-orbital" id="viewport-node">
+      <div class="planet-sphere"></div>
+      <div class="orbit-ellipse"></div>
+      <div class="iss-element" id="iss-node"></div>
+    </div>
+  </div>
+
+  <div class="dashboard-panel">
+    <h2>Space Engine Pro</h2>
+    <p id="status-text">Sincronizando telemetría espacial...</p>
+    
+    <div class="telemetry-grid">
+      <div class="card-metric">
+        <span>Latitud</span>
+        <strong id="m-lat">0.0000</strong>
+      </div>
+      <div class="card-metric">
+        <span>Longitud</span>
+        <strong id="m-lng">0.0000</strong>
+      </div>
+      <div class="card-metric">
+        <span>Orientación</span>
+        <strong id="m-snap" style="color: #38bdf8;">Anclado</strong>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const issNode = document.getElementById('iss-node');
+    const viewportNode = document.getElementById('viewport-node');
+    const mLat = document.getElementById('m-lat');
+    const mLng = document.getElementById('m-lng');
+    const mSnap = document.getElementById('m-snap');
+    const statusText = document.getElementById('status-text');
+
+    // Motor de mapeo matemático avanzado (Esfero-ortogonal) sin librerías externas
+    function locateSatellite(lat, lng, snap) {
+      const angle = ((lng + 180) / 360) * Math.PI * 2;
+      
+      const bounds = viewportNode.getBoundingClientRect();
+      const radiusX = (bounds.width || 300) * 0.46;
+      const radiusY = (bounds.height || 300) * 0.46;
+
+      const centerX = bounds.width / 2;
+      const centerY = bounds.height / 2;
+
+      const posX = centerX + Math.cos(angle) * radiusX;
+      const posY = centerY + Math.sin(angle) * radiusY * 0.42;
+
+      issNode.style.left = `${posX}px`;
+      issNode.style.top = `${posY}px`;
+      
+      const orbitRotation = (angle * (180 / Math.PI)) + 45;
+      issNode.style.transform = `translate(-50%, -50%) rotate(${orbitRotation}deg) scale(${snap ? 1.05 : 0.9})`;
+    }
+
+    // --- PUENTES GLOBALES (USADOS DIRECTAMENTE POR FLUTTER EN MÓVIL) ---
+    window.issResetCamera = function() { 
+      mSnap.textContent = 'Anclado';
+      statusText.textContent = 'Cámara reajustada al vector ISS.';
+    };
+
+    window.issReleaseCamera = function() {
+      mSnap.textContent = 'Libre';
+      statusText.textContent = 'Modo rotación libre activo.';
+    };
+
+    window.updateSpaceEngine = function(lat, lng, forceSnap) {
+      mLat.textContent = lat.toFixed(4);
+      mLng.textContent = lng.toFixed(4);
+      
+      if(forceSnap !== undefined) {
+        mSnap.textContent = forceSnap ? 'Anclado' : 'Libre';
+      }
+      statusText.textContent = 'ISS en órbita en vivo';
+
+      locateSatellite(lat, lng, mSnap.textContent === 'Anclado');
+    };
+
+    window.addEventListener('resize', () => {
+      const currentLat = parseFloat(mLat.textContent) || 0;
+      const currentLng = parseFloat(mLng.textContent) || 0;
+      locateSatellite(currentLat, currentLng, mSnap.textContent === 'Anclado');
+    });
+
+    // --- RECEPTOR DE MENSAJES (USADO POR FLUTTER EN WEB MEDIANTE IFRAME) ---
+    // Escucha eventos postMessage y los redirige a las funciones globales de arriba
+    window.addEventListener('message', (event) => {
+      const msg = event.data;
+      if (!msg || !msg.action) return;
+
+      if (msg.action === 'updateSpaceEngine') {
+        window.updateSpaceEngine(msg.lat, msg.lng, msg.snap);
+      } else if (msg.action === 'issResetCamera') {
+        window.issResetCamera();
+      } else if (msg.action === 'issReleaseCamera') {
+        window.issReleaseCamera();
+      }
+    });
+  </script>
+</body>
+</html>
